@@ -1,0 +1,112 @@
+<div class="container">
+  <div class="loans-header">
+    <h2>Ödünç Verme Listesi</h2>
+    <%= link_to "Ana Sayfaya Dön", root_path, class: "back-btn" %>
+  </div>
+
+  <div class="loans-section">
+    <h3>Aktif Ödünç Verilen Kitaplar (<%= @active_loans.count %>)</h3>
+    
+    <% if @active_loans.any? %>
+      <div class="loans-list">
+        <% @active_loans.each do |loan| %>
+          <div class="loan-item">
+            <div class="loan-book-info">
+              <h4><%= loan.book.title %></h4>
+              <p class="loan-author">Yazar: <%= loan.book.author %></p>
+            </div>
+            
+            <div class="loan-borrower-info">
+              <p><strong><%= loan.borrower.full_name %></strong></p>
+              <p>TC: <%= loan.borrower.tc_no %></p>
+              <p>Tel: <%= loan.borrower.phone %></p>
+              <p>E-posta: <%= loan.borrower.email %></p>
+            </div>
+            
+            <div class="loan-dates">
+              <p>Ödünç: <%= loan.loan_date.strftime('%d.%m.%Y') %></p>
+              <p>Geri Verme: <%= loan.return_date.strftime('%d.%m.%Y') %></p>
+              <% if loan.days_remaining > 0 %>
+                <p class="days-remaining"><%= loan.days_remaining %> gün kaldi</p>
+              <% elsif loan.days_remaining == 0 %>
+                <p class="due-today">Bugün teslim!</p>
+              <% end %>
+            </div>
+            
+            <div class="loan-actions">
+              <%= link_to "Detay", loan_path(loan), class: "detail-btn" %>
+              <%= button_to "Teslim Al", return_book_loan_path(loan), 
+                  method: :patch,
+                  form: { 
+                    data: { 
+                    turbo_confirm: "Kitabı teslim aldığınızdan emin misiniz?" 
+                    }
+                  },
+                  class: "return-btn" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="no-loans">Aktif ödünç verilen kitap bulunmuyor.</p>
+    <% end %>
+  </div>
+
+  <div class="loans-section">
+    <h3 class="overdue-title">Süre Aşımı Kitaplar (<%= @overdue_loans.count %>)</h3>
+    
+    <% if @overdue_loans.any? %>
+      <div class="loans-list">
+        <% @overdue_loans.each do |loan| %>
+          <div class="loan-item overdue-item">
+            <div class="loan-book-info">
+              <h4><%= loan.book.title %></h4>
+              <p class="loan-author">Yazar: <%= loan.book.author %></p>
+            </div>
+            
+            <div class="loan-borrower-info">
+              <p><strong><%= loan.borrower.full_name %></strong></p>
+              <p>TC: <%= loan.borrower.tc_no %></p>
+              <p>Tel: <%= loan.borrower.phone %></p>
+              <p>E-posta: <%= loan.borrower.email %></p>
+            </div>
+            
+            <div class="loan-dates">
+              <p>Ödünç: <%= loan.loan_date.strftime('%d.%m.%Y') %></p>
+              <p>Geri Verme: <%= loan.return_date.strftime('%d.%m.%Y') %></p>
+              
+              <% if loan.status == 'active' %>
+                <% if loan.return_date == Date.current %>
+                  <p class="due-today">Bugün teslim!</p>
+                <% elsif loan.return_date == Date.tomorrow %>
+                  <p class="due-tomorrow">Yarın teslim!</p>
+                <% elsif loan.return_date > Date.current %>
+                  <p class="days-remaining"><%= (loan.return_date - Date.current).to_i %> gün kaldı</p>
+                <% else %>
+                  <!-- Bu durumda loan overdue olması gerekir, ama güvenlik için -->
+                  <p class="overdue-warning">⚠️ Süre geçmiş!</p>
+                <% end %>
+              <% elsif loan.status == 'overdue' %>
+                <p class="overdue-days">⚠️ <%= loan.days_overdue %> gün gecikme</p>
+              <% end %>
+            </div>
+                        
+            <div class="loan-actions">
+              <%= link_to "Detay", loan_path(loan), class: "detail-btn" %>
+              <%= button_to "Teslim Al", return_book_loan_path(loan), 
+                  method: :patch,
+                    form: { 
+                      data: { 
+                        turbo_confirm: "Kitabı teslim aldığınızdan emin misiniz?" 
+                      }
+                    },
+                    class: "return-btn" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="no-loans">Süre aşımı kitap bulunmuyor.</p>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="book-detail-container">
+  <div class="book-detail">
+    <div class="book-image">
+      <% if @book.image.attached? %>
+        <%= image_tag @book.image, alt: @book.title, class: "book-cover" %>
+      <% elsif @book.image_url.present? %>
+        <%= image_tag @book.image_url, alt: @book.title, class: "book-cover" %>
+      <% else %>
+        <div class="no-image">Resim Yok</div>
+      <% end %>
+    </div>
+    
+    <div class="book-info">
+      <h1 class="book-title"><%= @book.title.upcase %></h1>
+      
+      <div class="book-details">
+        <p><strong>Yazar:</strong> <%= @book.author %></p>
+        <p><strong>Tür:</strong> <%= @book.genre %></p>
+        <p><strong>Kategori:</strong> <%= @book.category %></p>
+        <p><strong>Yıl:</strong> <%= @book.year %></p>
+        <p><strong>Sayfa Sayısı:</strong> <%= @book.page_count %></p>
+        <p><strong>Durum:</strong> 
+          <span class="status-badge <%= @book.available? ? 'available' : 'borrowed' %>">
+            <%= @book.status_text %>
+          </span>
+        </p>
+      </div>
+
+      <% if admin_logged_in? && @book.current_loan %>
+        <div class="loan-info">
+          <h3>Ödünç Verme Bilgileri</h3>
+          <div class="loan-details">
+            <p><strong>Ödünç Alan:</strong> <%= @book.current_loan.borrower.full_name %></p>
+            <p><strong>TC No:</strong> <%= @book.current_loan.borrower.tc_no %></p>
+            <p><strong>Telefon:</strong> <%= @book.current_loan.borrower.phone %></p>
+            <p><strong>E-posta:</strong> <%= @book.current_loan.borrower.email %></p>
+            <p><strong>Ödünç Alma Tarihi:</strong> <%= @book.current_loan.loan_date.strftime('%d.%m.%Y') %></p>
+            <p><strong>Geri Verme Tarihi:</strong> <%= @book.current_loan.return_date.strftime('%d.%m.%Y') %></p>
+            <% if @book.current_loan.overdue? %>
+              <p class="overdue-warning"><strong>⚠️ <%= @book.current_loan.days_overdue %> gün gecikme!</strong></p>
+            <% else %>
+              <p><strong>Kalan Süre:</strong> <%= @book.current_loan.days_remaining %> gün</p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      
+      <div class="book-actions-section">
+        <div class="actions-horizontal">
+          <%= link_to "Ana Sayfaya Dön", root_path, class: "action-btn" %>
+          
+          <% if admin_logged_in? %>
+            <%= link_to "Güncelle", edit_book_path(@book), class: "action-btn" %>
+            <% if @book.available? %>
+              <%= link_to "Ödünç Ver", new_book_loan_path(@book), class: "action-btn" %>
+            <% end %>
+            <% if @book.current_loan && (@book.current_loan.status != 'returned') %>
+              <%= button_to "Kitabı Teslim Al", return_book_loan_path(@book.current_loan), 
+                method: :patch,
+                form: { 
+                  data: { 
+                    turbo_confirm: "Kitabı teslim aldığınızdan emin misiniz?" 
+                  }
+                },
+                class: "action-btn" %>
+          <% end %>
+            <%= button_to "Sil", book_path(@book), method: :delete, 
+                data: { turbo_confirm: "Bu kitabı silmek istediğinizden emin misiniz?" }, 
+                class: "action-btn delete-action" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

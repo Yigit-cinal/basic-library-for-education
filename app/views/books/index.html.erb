@@ -1,0 +1,106 @@
+<div class="container">
+<div class="header">
+  <div class="left">
+    <% if admin_logged_in? %>
+      <%= link_to "Yeni Kitap Ekle", new_book_path, class: "add-book-btn" %>
+      <%= link_to "Ödünç Listesi", loans_path, class: "loans-list-btn" %>
+    <% end %>
+  </div>
+  
+  <div class="center">
+   <div class="search-section">
+      <%= form_with url: books_path, method: :get, local: true, class: "search-form" do |f| %>
+        <div class="search-input-wrapper">
+          <%= f.text_field :query, 
+              placeholder: "Kitap ara...", 
+              class: "search-input",
+              value: params[:query],
+              id: "search-input" %>
+        
+          <% if params[:query].present? %>
+            <%= link_to "×", books_path, 
+                class: "search-clear",
+                title: "Aramayı temizle" %>
+          <% end %>
+        </div>
+      
+        <%= f.submit "Ara", class: "search-button" %>
+      
+        <% if params[:query].present? %>
+          <%= link_to "Tüm Kitaplar", books_path, class: "show-all-button" %>
+        <% end %>
+      <% end %>
+    
+      <% if params[:query].present? %>
+        <div class="search-results-info">
+         "<%= params[:query] %>" için <%= @books.total_count %> sonuç bulundu
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="right">
+    <% if admin_logged_in? %>
+      <%= link_to "Çıkış", logout_path, method: :delete, class: "logout-btn", data: { "turbo-method": "delete" } %>
+    <% else %>
+      <%= link_to "Giriş", login_path, class: "login-btn" %>
+    <% end %>
+  </div>
+</div>
+  </div>
+
+  <div class="books-list">
+    <% if @books.any? %>
+      <% @books.each_with_index do |book, index| %>
+        <div class="book-item">
+          <span class="book-number"><%= ((params[:page] || 1).to_i - 1) * 50 + index + 1 %></span>
+          
+          <div class="book-image-container">
+            <% if book.image.attached? %>
+              <%= image_tag book.image, alt: book.title, class: "book-cover-small" %>
+            <% elsif book.image_url.present? %>
+              <%= image_tag book.image_url, alt: book.title, class: "book-cover-small" %>
+            <% else %>
+              <div class="no-image-placeholder">Resim Yok</div>
+            <% end %>
+          </div>
+          
+          <div class="book-content">
+            <div class="book-info-section">
+              <%= link_to book_path(book), class: "book-link" do %>
+                <div class="book-title"><%= book.title.upcase %></div>
+                <div class="book-author"><%= book.author %></div>
+              <% end %>
+            </div>
+            
+            <div class="book-status-container">
+              <div class="book-status">
+                <span class="status-badge <%= book.available? ? 'available' : 'borrowed' %>">
+                  <%= book.status_text %>
+                </span>
+              </div>
+              
+              <% if admin_logged_in? %>
+                <div class="admin-actions">
+                  <%= link_to "Güncelle", edit_book_path(book), class: "update-btn" %>
+                  <% if book.available? %>
+                    <%= link_to "Ödünç Ver", new_book_loan_path(book), class: "loan-btn" %>
+                  <% else %>
+                    <span class="borrowed-status">Ödünç Verildi</span>
+                  <% end %>
+                  <%= link_to 'Sil', book_path(book), data: { turbo_method: :delete, turbo_confirm: 'Kitabı silmek istediğinize emin misiniz?' }, class: 'delete-btn' %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="no-books">Aradığınız kitap bulunamadı.</p>
+    <% end %>
+  </div>
+
+  <div class="pagination-wrapper">
+    <%= paginate @books %>
+  </div>
+</div>

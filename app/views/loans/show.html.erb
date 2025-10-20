@@ -1,0 +1,63 @@
+<div class="loan-detail-container">
+  <div class="loan-detail">
+    <h2>Ödünç Verme Detayları</h2>
+    
+    <div class="loan-info-detail">
+      <div class="book-section">
+        <h3>Kitap Bilgileri</h3>
+        <p><strong>Kitap Adı:</strong> <%= @loan.book.title %></p>
+        <p><strong>Yazar:</strong> <%= @loan.book.author %></p>
+        <p><strong>Tür:</strong> <%= @loan.book.genre %></p>
+      </div>
+      
+      <div class="borrower-section">
+        <h3>Ödünç Alan Kişi</h3>
+        <p><strong>Adı Soyadı:</strong> <%= @loan.borrower.full_name %></p>
+        <p><strong>TC No:</strong> <%= @loan.borrower.tc_no %></p>
+        <p><strong>Telefon:</strong> <%= @loan.borrower.phone %></p>
+        <p><strong>E-posta:</strong> <%= @loan.borrower.email %></p>
+      </div>
+      
+      <div class="dates-section">
+        <h3>Tarih Bilgileri</h3>
+        <p><strong>Ödünç Alma Tarihi:</strong> <%= @loan.loan_date.strftime('%d.%m.%Y') %></p>
+        <p><strong>Geri Verme Tarihi:</strong> <%= @loan.return_date.strftime('%d.%m.%Y') %></p>
+        <% if @loan.actual_return_date %>
+          <p><strong>Teslim Tarihi:</strong> <%= @loan.actual_return_date.strftime('%d.%m.%Y') %></p>
+        <% end %>
+        <p><strong>Durum:</strong> 
+          <span class="loan-status <%= @loan.status %>">
+            <%= case @loan.status
+                when 'active' then 'Aktif'
+                when 'returned' then 'Teslim Edildi'
+                when 'overdue' then 'Süre Aşımı'
+                end %>
+          </span>
+        </p>
+        <% if @loan.status == 'active' %>
+          <% if @loan.days_remaining > 0 %>
+            <p class="days-info"><strong>Kalan Süre:</strong> <%= @loan.days_remaining %> gün</p>
+          <% elsif @loan.days_remaining == 0 %>
+            <p class="due-today"><strong>Bugün teslim edilmeli!</strong></p>
+          <% end %>
+        <% elsif @loan.status == 'overdue' %>
+          <p class="overdue-info"><strong>Gecikme:</strong> <%= @loan.days_overdue %> gün</p>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <%= link_to "Ödünç Listesine Dön", loans_path, class: "back-btn" %>
+      <%= link_to "Kitap Detayı", @loan.book, class: "book-detail-btn" %>
+      
+      <% if @loan.status == 'active' || @loan.status == 'overdue' %>
+        <%= link_to "Kitabı Teslim Al", return_book_loan_path(@loan), 
+            data: { 
+              turbo_method: :patch,
+              turbo_confirm: "Kitabı teslim aldığınızdan emin misiniz?" 
+            },
+            class: "return-btn" %>
+      <% end %>
+    </div>
+  </div>
+</div>

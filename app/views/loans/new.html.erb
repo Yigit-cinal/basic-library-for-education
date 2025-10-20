@@ -1,0 +1,75 @@
+<div class="form-container">
+  <div class="form-wrapper">
+    <h2><%= @book.title %> - Ödünç Verme</h2>
+    
+    <%= form_with model: [@book, @loan], local: true, class: "loan-form" do |form| %>
+      <% if @borrower.errors.any? %>
+        <div class="error-messages">
+          <h4><%= pluralize(@borrower.errors.count, "hata") %> nedeniyle işlem tamamlanamadı:</h4>
+          <ul>
+            <% @borrower.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <% if @loan.errors.any? %>
+        <div class="error-messages">
+          <h4><%= pluralize(@loan.errors.count, "hata") %> nedeniyle işlem tamamlanamadı:</h4>
+          <ul>
+            <% @loan.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="book-info-summary">
+        <h3>Kitap Bilgileri</h3>
+        <p><strong>Kitap Adı:</strong> <%= @book.title %></p>
+        <p><strong>Yazar:</strong> <%= @book.author %></p>
+      </div>
+
+      <h3>Ödünç Alan Kişi Bilgileri</h3>
+      
+      <%= form.fields_for :borrower_attributes do |borrower_form| %>
+        <div class="form-group">
+          <%= borrower_form.label :tc_no, "TC Kimlik No:", class: "form-label" %>
+          <%= borrower_form.text_field :tc_no, class: "form-input", required: true, maxlength: 11 %>
+        </div>
+
+        <div class="form-group">
+          <%= borrower_form.label :name, "İsim:", class: "form-label" %>
+          <%= borrower_form.text_field :name, class: "form-input", required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= borrower_form.label :surname, "Soyisim:", class: "form-label" %>
+          <%= borrower_form.text_field :surname, class: "form-input", required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= borrower_form.label :phone, "Telefon:", class: "form-label" %>
+          <%= borrower_form.text_field :phone, class: "form-input", required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= borrower_form.label :email, "E-posta:", class: "form-label" %>
+          <%= borrower_form.text_field :email, class: "form-input", required: true, type: "email" %>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= form.label :loan_duration, "Ödünç Süresi (Gün):", class: "form-label" %>
+        <%= form.number_field :loan_duration, class: "form-input", required: true, min: 1, max: 30, value: 14 %>
+        <small class="form-help">Maksimum 30 gün</small>
+      </div>
+
+      <div class="form-actions">
+        <%= form.submit "Ödünç Ver", class: "submit-btn" %>
+        <%= link_to "İptal", @book, class: "cancel-btn" %>
+      </div>
+    <% end %>
+  </div>
+</div>
