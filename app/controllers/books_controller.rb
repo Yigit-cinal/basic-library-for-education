@@ -1,14 +1,14 @@
 class BooksController < ApplicationController
-  before_action :set_book, only: [:show, :edit, :update, :destroy]
-  before_action :require_admin, only: [:new, :create, :edit, :update, :destroy]
+  before_action :set_book, only: [ :show, :edit, :update, :destroy ]
+  before_action :require_admin, only: [ :new, :create, :edit, :update, :destroy ]
 
 def index
   @books = Book.includes(:current_loan)
-  
+
   if params[:query].present?
     @books = @books.where("LOWER(title) LIKE ?", "%#{params[:query].downcase}%")
   end
-  
+
   @books = @books.page(params[:page]).per(50)
 end
 
@@ -25,7 +25,7 @@ end
   def create
     @book = Book.new(book_params)
     if @book.save
-      redirect_to root_path, notice: 'Kitap başarıyla eklendi!'
+      redirect_to root_path, notice: "Kitap başarıyla eklendi!"
     else
       render :new, status: :unprocessable_entity
     end
@@ -36,15 +36,15 @@ end
 
   def update
     if @book.update(book_params)
-      redirect_to @book, notice: 'Kitap başarıyla güncellendi!'
+      redirect_to @book, notice: "Kitap başarıyla güncellendi!"
     else
       render :edit, status: :unprocessable_entity
     end
-  end 
+  end
 
   def destroy
     @book.destroy
-    redirect_to root_path, notice: 'Kitap başarıyla silindi!'
+    redirect_to root_path, notice: "Kitap başarıyla silindi!"
   end
 
   private
@@ -59,7 +59,7 @@ end
 
   def require_admin
     unless admin_logged_in?
-      redirect_to root_path, alert: 'Bu işlem için admin girişi gerekli!'
+      redirect_to root_path, alert: "Bu işlem için admin girişi gerekli!"
     end
   end
 end
