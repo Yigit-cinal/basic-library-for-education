@@ -4,7 +4,6 @@ Modern ve kullanıcı dostu kütüphane yönetim uygulaması. Ruby on Rails ile 
 
 ![Rails Version](https://img.shields.io/badge/Rails-7.0+-red.svg)
 ![Ruby Version](https://img.shields.io/badge/Ruby-3.0+-red.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 ## 📋 İçindekiler
 
