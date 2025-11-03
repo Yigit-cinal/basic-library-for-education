@@ -13,7 +13,6 @@ Modern ve kullanıcı dostu kütüphane yönetim uygulaması. Ruby on Rails ile 
 - [Kurulum](#kurulum)
 - [Kullanım](#kullanım)
 - [Veritabanı Yapısı](#veritabanı-yapısı)
-- [Lisans](#lisans)
 
 ## ✨ Özellikler
 
@@ -242,10 +241,6 @@ rails test:coverage
 - [ ] Çoklu admin kullanıcı desteği yok
 - [ ] E-posta bildirimleri henüz eklenmedi
 - [ ] Excel/PDF export özelliği yok
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
 ## 👨‍💻 Geliştirici
 
